@@ -37,6 +37,8 @@ local function shouldFuel()
 	end
 end
 
+print(args)
+
 for _ = 1, 1000, 1 do
 	if shouldFuel() then
 		fuelUp()
