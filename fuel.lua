@@ -1,7 +1,9 @@
 ---@diagnostic disable:undefined-global
 
+local fuel = {}
+
 ---@return boolean, string?
-local function fuelUp()
+function fuel.fuelUp()
 	local is_fuel, _ = turtle.refuel(0)
 	if not is_fuel then
 		local foundFuel = false
@@ -27,17 +29,14 @@ local function fuelUp()
 	return true
 end
 
-local function shouldFuel()
-	local fuel = turtle.getFuelLevel()
-	print(fuel)
-	if fuel < 5 then
+function fuel.shouldFuel()
+	local amount = turtle.getFuelLevel()
+	if amount < 5 then
 		return true
 	else
 		return false
 	end
 end
-
-print(args)
 
 for _ = 1, 1000, 1 do
 	if shouldFuel() then
@@ -53,3 +52,5 @@ for _ = 1, 1000, 1 do
 		end
 	end
 end
+
+return fuel
