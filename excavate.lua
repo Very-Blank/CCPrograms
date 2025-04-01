@@ -93,13 +93,41 @@ if fuel.shouldFuel() then
 	end
 end
 
-digTurnDir(1, "right")
-destroyForward(math.floor(x / 2))
-digTurnDir(1, "left")
+local ok, msg = digTurnDir(1, "right")
+if not ok then
+	printError(msg)
+	return
+end
+ok, msg = destroyForward(math.floor(x / 2))
+if not ok then
+	printError(msg)
+	return
+end
+ok, msg = digTurnDir(1, "left")
+if not ok then
+	printError(msg)
+	return
+end
 
 for _ = 1, 1 + math.floor(x / 2) * 2, 1 do
-	destroyForward(z - 2)
-	digTurnDir(2, "left")
-	destroyForward(z - 2)
-	digTurnDir(2, "right")
+	ok, msg = destroyForward(z - 2)
+	if not ok then
+		printError(msg)
+		return
+	end
+	ok, msg = digTurnDir(2, "left")
+	if not ok then
+		printError(msg)
+		return
+	end
+	ok, msg = destroyForward(z - 2)
+	if not ok then
+		printError(msg)
+		return
+	end
+	ok, msg = digTurnDir(2, "right")
+	if not ok then
+		printError(msg)
+		return
+	end
 end
