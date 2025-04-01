@@ -25,18 +25,46 @@ local x = tonumber(args[1])
 local z = tonumber(args[3])
 
 ---comment
----@param length number
+---@param width number
 ---@return boolean
 ---@return string?
-local function destroyForward(length)
+local function destroyForward(width)
+	for _ = 1, width, 1 do
+		local ok, msg = turtle.dig()
+		if not ok and msg ~= "Nothing to dig here" then
+			return false, msg
+		end
+		ok, msg = turtle.forward()
+		if not ok then
+			return false, msg
+		end
+
+		if fuel.shouldFuel() then
+			ok, msg = fuel.fuelUp()
+			if not ok then
+				return false, msg
+			end
+		end
+	end
+	return true
+end
+
+local function move(direction, amount)
 	for _ = 1, length, 1 do
 		local ok, msg = turtle.dig()
 		if not ok and msg ~= "Nothing to dig here" then
 			return false, msg
 		end
-		ok, msg = turle.forward()
+		ok, msg = turtle.forward()
 		if not ok then
 			return false, msg
+		end
+
+		if fuel.shouldFuel() then
+			ok, msg = fuel.fuelUp()
+			if not ok then
+				return false, msg
+			end
 		end
 	end
 	return true
@@ -85,11 +113,75 @@ local function digTurnDir(times, dir)
 	return true
 end
 
-if fuel.shouldFuel() then
-	local succeeded, err = fuel.fuelUp()
-	if succeeded then
-		printError(err)
+---@param current string
+local function flipDirection(current)
+	if current == "left" then
+		return "right"
+	else
+		return "left"
 	end
+end
+
+---@param length any
+---@param width any
+---@return boolean
+---@return string?
+local function clearLevel(length, width)
+	local ok, msg = destroyForward(math.floor(length / 2) - 1)
+	if not ok then
+		return false, msg
+	end
+
+	ok, msg = digTurnDir(1, "left")
+	if not ok then
+		return false, msg
+	end
+
+	local dir = "left"
+
+	for _ = 1, math.floor(length / 2) * 2, 1 do
+		ok, msg = destroyForward(width - 2)
+		if not ok then
+			return false, msg
+		end
+		ok, msg = digTurnDir(2, dir)
+		dir = flipDirection(dir)
+
+		if not ok then
+			return false, msg
+		end
+	end
+
+	ok, msg = destroyForward(width - 2)
+	if not ok then
+		return false, msg
+	end
+
+	ok, msg = turtle.dig()
+	if not ok and msg ~= "Nothing to dig here" then
+		return false, msg
+	end
+
+	for _ = 1, z - 2, 1 do
+		ok, msg = turtle.back()
+		if not ok then
+			return false, msg
+		end
+	end
+
+	ok, msg = turtle.turnRight()
+	if not ok then
+		return false, msg
+	end
+
+	for _ = 1, math.floor(length / 2), 1 do
+		ok, msg = turtle.forward()
+		if not ok then
+			return false, msg
+		end
+	end
+
+	return true
 end
 
 local ok, msg = digTurnDir(1, "right")
@@ -97,36 +189,5 @@ if not ok then
 	printError(msg)
 	return
 end
-ok, msg = destroyForward(math.floor(x / 2))
-if not ok then
-	printError(msg)
-	return
-end
-ok, msg = digTurnDir(1, "left")
-if not ok then
-	printError(msg)
-	return
-end
 
-for _ = 1, 1 + math.floor(x / 2) * 2, 1 do
-	ok, msg = destroyForward(z - 2)
-	if not ok then
-		printError(msg)
-		return
-	end
-	ok, msg = digTurnDir(2, "left")
-	if not ok then
-		printError(msg)
-		return
-	end
-	ok, msg = destroyForward(z - 2)
-	if not ok then
-		printError(msg)
-		return
-	end
-	ok, msg = digTurnDir(2, "right")
-	if not ok then
-		printError(msg)
-		return
-	end
-end
+clearLevel(x, z)
