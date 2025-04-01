@@ -63,8 +63,7 @@ local function digTurnDir(times, dir)
 				return false, msg
 			end
 		end
-	end
-	if dir == "left" then
+	elseif dir == "left" then
 		for _ = 1, times, 1 do
 			local ok, msg = turtle.dig()
 			if not ok and msg ~= "Nothing to dig here" then
