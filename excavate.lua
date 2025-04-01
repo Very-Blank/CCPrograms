@@ -31,7 +31,7 @@ local z = tonumber(args[3])
 local function destroyForward(length)
 	for _ = 1, length, 1 do
 		local ok, msg = turtle.dig()
-		if not ok then
+		if not ok and msg ~= "Nothing to dig here" then
 			return false, msg
 		end
 		ok, msg = turle.forward()
@@ -51,14 +51,14 @@ local function digTurnDir(times, dir)
 	if dir == "right" then
 		for _ = 1, times, 1 do
 			local ok, msg = turtle.dig()
+			if not ok and msg ~= "Nothing to dig here" then
+				return false, msg
+			end
+			ok, msg = turtle.forward()
 			if not ok then
 				return false, msg
 			end
-			ok, msg = turle.forward()
-			if not ok then
-				return false, msg
-			end
-			ok, msg = turle.turnRight()
+			ok, msg = turtle.turnRight()
 			if not ok then
 				return false, msg
 			end
@@ -67,14 +67,14 @@ local function digTurnDir(times, dir)
 	if dir == "left" then
 		for _ = 1, times, 1 do
 			local ok, msg = turtle.dig()
+			if not ok and msg ~= "Nothing to dig here" then
+				return false, msg
+			end
+			ok, msg = turtle.forward()
 			if not ok then
 				return false, msg
 			end
-			ok, msg = turle.forward()
-			if not ok then
-				return false, msg
-			end
-			ok, msg = turle.turnLeft()
+			ok, msg = turtle.turnLeft()
 			if not ok then
 				return false, msg
 			end
