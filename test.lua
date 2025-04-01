@@ -30,7 +30,7 @@ end
 local function shouldFuel()
 	local fuel = turtle.getFuelLevel()
 	print(fuel)
-	if fuel < 20.0 then
+	if fuel < 5 then
 		return true
 	else
 		return false
@@ -44,7 +44,10 @@ for _ = 1, 1000, 1 do
 
 	local succeeded, err = turtle.forward()
 	if not succeeded then
-		printError(err)
-		break
+		succeeded, err = turtle.up()
+		if not succeeded then
+			printError(err)
+			break
+		end
 	end
 end
