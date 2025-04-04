@@ -8,31 +8,30 @@ end
 
 local turn = args[1]
 if turn == nil then
-	printError("Arg was nill")
+	error("Arg was nill")
 	return
 else
 	if turn ~= "left" and turn ~= "right" then
-		printError("Incorrect turn direction")
+		error("Incorrect turn direction")
 		return
 	end
 end
 
 local item = turtle.getItemDetail(slot)
 if item == nil then
-	printError("No Item selected")
+	error("No Item selected")
 	return
 end
 
 if fuel.shouldFuel() then
 	local ok, msg = fuel.fuelUp()
 	if not ok then
-		printError(msg)
-		return
+		error(msg)
 	end
 end
 
 local function selectNewItem()
-	for slot = 1, 15, 1 do
+	for slot = 1, 16, 1 do
 		local slotItem = turtle.getItemDetail(slot)
 		if slotItem ~= nil then
 			if slotItem.name == item.name then
@@ -45,10 +44,15 @@ local function selectNewItem()
 	return false, "No item found"
 end
 
-local function placeDown()
+local function tryPlaceBlock()
 	local ok, msg = turtle.placeDown()
-	if not ok and msg ~= "No items to place" then
+	if not ok and msg == "No items to place" then
 		ok, msg = selectNewItem()
+		if not ok then
+			return ok, msg
+		end
+
+		local ok, msg = turtle.placeDown()
 		if not ok then
 			return ok, msg
 		end
@@ -60,60 +64,52 @@ local function placeDown()
 end
 
 while true do
-	local ok, msg = placeDown()
+	local ok, msg = tryPlaceBlock()
 	if not ok then
-		printError(msg)
-		return
+		error(msg)
 	end
 
 	ok, msg = turtle.forward()
 	if not ok and msg == "Movement obstructed" then
 		if turn == "right" then
 			for _ = 1, 2, 1 do
-				ok, msg = placeDown()
+				ok, msg = tryPlaceBlock()
 				if not ok and msg ~= "Cannot place block here" then
-					printError(msg)
-					return
+					error(msg)
 				end
 				ok, msg = turtle.turnRight()
 				if not ok then
-					printError(msg)
-					return
+					error(msg)
 				end
 				ok, msg = turtle.forward()
 				if not ok then
-					printError(msg)
-					return
+					error(msg)
 				end
 			end
 
 			turn = "left"
 		elseif turn == "left" then
 			for _ = 1, 2, 1 do
-				ok, msg = placeDown()
+				ok, msg = tryPlaceBlock()
 				if not ok and msg ~= "Cannot place block here" then
-					printError(msg)
-					return
+					error(msg)
 				end
 				ok, msg = turtle.turnLeft()
 				if not ok then
-					printError(msg)
-					return
+					error(msg)
 				end
 				ok, msg = turtle.forward()
 				if not ok then
-					printError(msg)
-					return
+					error(msg)
 				end
 			end
 			turn = "right"
 		else
-			printError("Something went wrong")
-			return
+			error("Something went wrong")
 		end
 	elseif not ok then
 		turtle.up()
-		printError(msg)
+		error(msg)
 		return
 	end
 end

@@ -3,19 +3,17 @@ local fuel = require("fuel")
 local args = { ... }
 
 if #args ~= 3 then
-	printError("Incorrect amount of arguments")
+	error("Incorrect amount of arguments")
 	return
 else
 	for _, arg in ipairs(args) do
 		local num = tonumber(arg)
 		if num == nil then
-			printError("Argument wasn't a number")
-			return
+			error("Argument wasn't a number")
 		end
 
 		if math.floor(num) ~= num then
-			printError("Argument wasn't a whole number")
-			return
+			error("Argument wasn't a whole number")
 		end
 	end
 end
@@ -144,6 +142,13 @@ local function clearLevel(length, width)
 		if not ok then
 			return false, msg
 		end
+
+		if fuel.shouldFuel() then
+			ok, msg = fuel.fuelUp()
+			if not ok then
+				return false, msg
+			end
+		end
 	end
 
 	ok, msg = move("forward", width)
@@ -175,13 +180,6 @@ local function clearLevel(length, width)
 		end
 	end
 
-	if fuel.shouldFuel() then
-		ok, msg = fuel.fuelUp()
-		if not ok then
-			return false, msg
-		end
-	end
-
 	return true
 end
 
@@ -207,14 +205,21 @@ end
 
 local ok, msg = digTurnDir(1, "right")
 if not ok then
-	printError(msg)
-	return
+	error(msg)
 end
 
-move("down", y)
+ok, msg = move("down", y)
+if not ok then
+	error(msg)
+end
+
 for i = 1, y * 2 + 1, 1 do
-	clearLevel(x, z)
+	ok, msg = clearLevel(x, z)
+	if not ok then
+		error(msg)
+	end
 	if i ~= y * 2 + 1 then
-		move("up", 1)
+		ok, msg = move("up", 1)
+		error(msg)
 	end
 end

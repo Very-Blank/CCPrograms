@@ -7,7 +7,7 @@ function fuel.fuelUp()
 	local is_fuel, _ = turtle.refuel(0)
 	if not is_fuel then
 		local foundFuel = false
-		for slot = 1, 15, 1 do
+		for slot = 1, 16, 1 do
 			turtle.select(slot)
 			local isFuel, _ = turtle.refuel(0)
 			if isFuel then
